@@ -39,6 +39,13 @@ const userSchema = new mongoose.Schema({
     minlength: [2, 'The minimum length of name is 2'],
     maxlength: [30, 'The maximum length of name is 30'],
   },
+
+  age: {
+    type: Number,
+    required: [true, 'The "age" field must be filled in'],
+    minLength: [1, 'The minimum length of age is 1'],
+    maxLength: [2, 'The maximum lenght of age is 2'],
+  },
 });
 
 userSchema.statics.findUserByCredentials = function (email, password) {

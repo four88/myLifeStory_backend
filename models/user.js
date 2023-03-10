@@ -43,8 +43,12 @@ const userSchema = new mongoose.Schema({
   age: {
     type: Number,
     required: [true, 'The "age" field must be filled in'],
-    minLength: [1, 'The minimum length of age is 1'],
-    maxLength: [2, 'The maximum lenght of age is 2'],
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+    required: [true, 'The "role" field must filled in'],
   },
 });
 

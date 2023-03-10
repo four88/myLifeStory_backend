@@ -4,13 +4,9 @@ const validator = require('validator');
 const chapterSchema = new mongoose.Schema({
   no: {
     type: Number,
-    required: [true, 'The "no" field must be filled in'],
+    required: [true, 'The "no" field in page section must be filled in'],
   },
-  name: {
-    type: String,
-    required: [true, 'The "name" field must be filled in'],
-  },
-  thumbNail: {
+  pageImg: {
     type: String,
     required: [true, 'The article must contain image URL'],
     validate: {
@@ -18,10 +14,13 @@ const chapterSchema = new mongoose.Schema({
       message: 'Wrong image URL format',
     },
   },
-  owner: {
+  story: {
+    type: String,
+  },
+  chapter: {
     type: mongoose.Types.ObjectId,
     required: [true, 'The chapter must contain owner id for save'],
-    ref: 'user',
+    ref: 'chapter',
     select: false,
   },
 });

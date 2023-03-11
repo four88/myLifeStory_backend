@@ -1,26 +1,30 @@
 const mongoose = require('mongoose');
-const Chapter = require('../models/chapter');
+const Page = require('../models/page');
 
 const NotFoundError = require('../errors/notFoundError');
 const BadRequestError = require('../errors/badRequestError');
 const { SUCCESS_CODE } = require('../utils/constant');
 
-// create chapter
+// create page
 // eslint-disable-next-line
-module.exports.createChapter = (req, res, next) => {
+module.exports.createPage = (req, res, next) => {
   const {
-    no, name, thumbNail, owner,
-  } = req.body;
-  Chapter.create({
     no,
-    name,
-    thumbNail,
-    owner,
+    pageImg,
+    story,
+    chapter,
+  } = req.body;
+
+  Page.create({
+    no,
+    pageImg,
+    story,
+    chapter,
   })
-    .then((chapter) => res.status(SUCCESS_CODE).send({ data: chapter }))
+    .then((page) => res.status(SUCCESS_CODE).send({ data: page }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Invalid input of article'));
+        next(new BadRequestError('Invalid input of page'));
       } else {
         // eslint-disable-next-line
         next(err);
@@ -28,53 +32,53 @@ module.exports.createChapter = (req, res, next) => {
     });
 };
 
-// get chapter
+// get page from chapterId
 // eslint-disable-next-line
-module.exports.getUserChapter = (req,res, next) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
-    throw new NotFoundError('Not found this user Id');
+module.exports.getPage = (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.chapterId)) {
+    throw new NotFoundError('Not found this chapter Id');
   }
 
-  Chapter.find({ owner: req.params.userId }).select('+owner')
-    .then((chapter) => {
-      res.status(SUCCESS_CODE).send({ data: chapter });
+  Page.find({ chapter: req.params.chapterId }).select('+chapter')
+    .then((page) => {
+      res.status(SUCCESS_CODE).send({ data: page });
     })
     .catch(next);
 };
 
 // delete chapter
 // eslint-disable-next-line
-module.exports.deleteChapter = (req, res, next) => {
-  const id = req.params.chapterId;
+module.exports.deletePage = (req, res, next) => {
+  const id = req.params.pageId;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new NotFoundError('Not found this chapter id');
+    throw new NotFoundError('Not found this page id');
   }
-  Chapter.findByIdAndRemove(id)
-    .then((chapter) => {
-      res.status(SUCCESS_CODE).send({ data: chapter });
+  Page.findByIdAndRemove(id)
+    .then((page) => {
+      res.status(SUCCESS_CODE).send({ data: page });
     })
     .catch(next);
 };
 
 // edit chapter
 // eslint-disable-next-line
-module.exports.editChapter = (req, res, next) => {
+module.exports.editPage = (req, res, next) => {
   const {
     no,
-    name,
-    thumbNail,
+    pageImg,
+    story,
   } = req.body;
 
-  const id = req.params.chapterId;
+  const id = req.params.pageId;
 
-  Chapter.findByIdAndUpdate(id, { no, name, thumbNail }, { runValidators: true, new: true })
+  Page.findByIdAndUpdate(id, { no, pageImg, story }, { runValidators: true, new: true })
     .orFail(() => {
       const error = new Error('Can not find this specific id');
       error.statusCode = 404;
       throw error;
     })
-    .then((chapter) => res.status(SUCCESS_CODE).send({ data: chapter }))
+    .then((page) => res.status(SUCCESS_CODE).send({ data: page }))
     .catch((err) => {
       if (err.name === 'CastError') {
         // eslint-disable-next-line

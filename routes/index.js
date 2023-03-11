@@ -3,6 +3,7 @@ const { celebrate, Joi } = require('celebrate');
 const { registerUser, loginUser, loginAdmin, getAllUser } = require('../controllers/user');
 const userRoutes = require('./user');
 const chapterRoutes = require('./chapter');
+const pageRoutes = require('./page');
 // const auth = require('../middlewares/auth');
 const NotFoundError = require('../errors/notFoundError');
 
@@ -30,6 +31,9 @@ router.use('/user', userRoutes);
 
 // chapter route
 router.use('/chapter', chapterRoutes);
+
+// page route
+router.use('/page', pageRoutes);
 
 // for random route not includes in this project
 router.get('*', () => {

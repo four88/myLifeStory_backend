@@ -7,6 +7,7 @@ const dotenv = require('dotenv');
 const { errors } = require('celebrate');
 const { router } = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { NotFoundError } = require('./utils/constant');
 
 const { PORT = 3000 } = process.env;
 
@@ -22,15 +23,14 @@ const dbConfig = {
 };
 mongoose.Promise = global.Promise;
 // connect DB
-mongoose.connect(NODE_ENV === 'production' ? DB_URI : dbUri, dbConfig)
-  .then(
-    () => {
-      console.log('DB connected');
-    },
-    (err) => {
-      console.log(`cannot connect to DB: ${err}`);
-    },
-  );
+mongoose.connect(NODE_ENV === 'production' ? DB_URI : dbUri, dbConfig).then(
+  () => {
+    console.log('DB connected');
+  },
+  (err) => {
+    console.log(`cannot connect to DB: ${err}`);
+  },
+);
 
 // use helment for security
 app.use(helmet());
@@ -41,9 +41,11 @@ app.use(requestLogger);
 // use body-parser for work with http data transfer
 // especially json format
 app.use(bodyParser.json(), cors());
-app.use(bodyParser.urlencoded({
-  extended: true,
-}));
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  }),
+);
 
 // middleware for allow a cors
 // app.use((req, res, next) => {
@@ -55,13 +57,6 @@ app.use(bodyParser.urlencoded({
 //   next();
 // });
 //
-app.use((req, res, next) => {
-  req.user = {
-    _id: '640b083575b962e4cedfc85c',
-  };
-
-  next();
-});
 app.options('*', cors());
 
 // routes
@@ -77,11 +72,9 @@ router.get('*', () => {
 });
 
 app.use((err, req, res, next) => {
-  res
-    .status(err.statusCode ? err.statusCode : 500)
-    .send({
-      message: err.message ? err.message : 'An error occurred on the server',
-    });
+  res.status(err.statusCode ? err.statusCode : 500).send({
+    message: err.message ? err.message : 'An error occurred on the server',
+  });
 });
 
 // connect port

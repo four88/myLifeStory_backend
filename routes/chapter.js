@@ -2,7 +2,9 @@ const router = require('express').Router();
 
 const { celebrate, Joi } = require('celebrate');
 
-const { createChapter, getUserChapter, deleteChapter, editChapter } = require('../controllers/chapter');
+const {
+  createChapter, getUserChapter, deleteChapter, editChapter,
+} = require('../controllers/chapter');
 
 router.post('/', celebrate({
   body: Joi.object().keys({

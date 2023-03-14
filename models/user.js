@@ -3,6 +3,15 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
+  img: {
+    type: String,
+    required: [true, 'The article must contain image URL'],
+    validate: {
+      validator: (v) => validator.isURL(v),
+      message: 'Wrong image URL format',
+    },
+  },
+
   email: {
     type: String,
     unique: [true, 'This email is already used'],
@@ -53,19 +62,19 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.statics.findUserByCredentials = function (email, password) {
-  return this.findOne({ email }).select('+password')
+  return this.findOne({ email })
+    .select('+password')
     .then((user) => {
       if (!user) {
         return Promise.reject(new Error('Incorrect password or email'));
       }
 
-      return bcrypt.compare(password, user.password)
-        .then((matched) => {
-          if (!matched) {
-            return Promise.reject(new Error('Incorrect password or email'));
-          }
-          return user;
-        });
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          return Promise.reject(new Error('Incorrect password or email'));
+        }
+        return user;
+      });
     });
 };
 

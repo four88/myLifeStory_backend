@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const avatarSchema = mongoose.Schema({
+  gender: {
+    type: String,
+    enum: ['male', 'female'],
+    required: [true, 'This "gender" field must fill in'],
+  },
   hair: {
     type: String,
     required: [true, 'This "hair" field must fill in'],
@@ -25,4 +30,4 @@ const avatarSchema = mongoose.Schema({
   },
 });
 
-module.export = mongoose.model('avatar', avatarSchema);
+module.exports = mongoose.model('avatar', avatarSchema);

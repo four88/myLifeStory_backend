@@ -22,8 +22,8 @@ module.exports.getUserInfo = (req, res, next) => {
 
 // show all user
 // eslint-disable-next-line
-module.exports.getAllUser = (req,res, next) => {
-  User.find({})
+module.exports.getAllUser = (req, res, next) => {
+  User.find({ role: 'user' })
     .orFail(() => {
       new NotFoundError('Cannot found any user');
     })
@@ -35,39 +35,41 @@ module.exports.getAllUser = (req,res, next) => {
 // eslint-disable-next-line
 module.exports.registerUser = (req, res, next) => {
   const {
-    email, password, firstname, surname, name, age, role,
+    email, password, firstname, surname, name, age, role, img,
   } = req.body;
-  bcrypt.hash(password, 10)
-    .then((hash) => {
-      User.create({
-        email,
-        firstname,
-        surname,
-        name,
-        age,
-        role,
-        password: hash,
-      })
-        .then((user) => res.status(SUCCESS_CODE).send({
-          data: {
-            _id: user._id,
-            name: user.name,
-            role: user.role,
-          },
-        }))
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            // eslint-disable-next-line
-            next(new BadRequestError('Missing or Invalid email or password'));
-          } if (err.name === 'MongoServerError') {
-            // eslint-disable-next-line
-            next(new ConflictError('This email is already exits'));
-          } else {
-            // eslint-disable-next-line
-            next(err);
-          }
-        });
-    });
+  bcrypt.hash(password, 10).then((hash) => {
+    User.create({
+      img,
+      email,
+      firstname,
+      surname,
+      name,
+      age,
+      role,
+      password: hash,
+    })
+      .then((user) => res.status(SUCCESS_CODE).send({
+        data: {
+          _id: user._id,
+          name: user.name,
+          img: user.img,
+          role: user.role,
+        },
+      }))
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          // eslint-disable-next-line
+          next(new BadRequestError("Missing or Invalid email or password"));
+        }
+        if (err.name === 'MongoServerError') {
+          // eslint-disable-next-line
+          next(new ConflictError("This email is already exits"));
+        } else {
+          // eslint-disable-next-line
+          next(err);
+        }
+      });
+  });
 };
 
 // login for user
@@ -85,11 +87,12 @@ module.exports.loginUser = (req, res, next) => {
           ),
           name: user.name,
           email: user.email,
+          img: user.img,
         });
       })
       .catch(() => {
         // eslint-disable-next-line
-        next(new UnauthorizedError('Incorrect email or password'));
+        next(new UnauthorizedError("Incorrect email or password"));
       });
   }
 };
@@ -97,10 +100,11 @@ module.exports.loginUser = (req, res, next) => {
 // login for admin
 // eslint-disable-next-line
 module.exports.loginAdmin = (req, res, next) => {
-  const { email, password, role } = req.body;
-  if (role === 'admin') {
-    User.findUserByCredentials(email, password)
-      .then((user) => {
+  const { email, password } = req.body;
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      console.log(user);
+      if (user.role === 'admin') {
         res.status(SUCCESS_CODE).send({
           token: jwt.sign(
             { _id: user._id },
@@ -109,11 +113,16 @@ module.exports.loginAdmin = (req, res, next) => {
           ),
           name: user.name,
           email: user.email,
+          firstname: user.firstname,
+          surname: user.surname,
+          img: user.img,
         });
-      })
-      .catch(() => {
-        // eslint-disable-next-line
-        next(new UnauthorizedError('Incorrect email or password'));
-      });
-  }
+      } else {
+        next(new UnauthorizedError('This account is not admin'));
+      }
+    })
+    .catch(() => {
+      // eslint-disable-next-line
+      next(new UnauthorizedError("Incorrect email or password"));
+    });
 };

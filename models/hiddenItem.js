@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 const hiddenItemSchema = new mongoose.Schema({
   name: {
@@ -13,10 +14,11 @@ const hiddenItemSchema = new mongoose.Schema({
     minlength: [2, 'The minimum length of desc is 2'],
   },
   img: {
-    data: Buffer,
-    contentType: {
-      type: String,
-      required: true,
+    type: String,
+    required: [true, 'The hidden item must contain image URL'],
+    validate: {
+      validator: (v) => validator.isURL(v),
+      message: 'Wrong image URL format',
     },
   },
   owner: {
@@ -27,4 +29,4 @@ const hiddenItemSchema = new mongoose.Schema({
   },
 });
 
-module.export = mongoose.model('hiddenItem', hiddenItemSchema);
+module.exports = mongoose.model('hiddenItem', hiddenItemSchema);

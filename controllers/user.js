@@ -103,7 +103,6 @@ module.exports.loginAdmin = (req, res, next) => {
   const { email, password } = req.body;
   User.findUserByCredentials(email, password)
     .then((user) => {
-      console.log(user);
       if (user.role === 'admin') {
         res.status(SUCCESS_CODE).send({
           token: jwt.sign(

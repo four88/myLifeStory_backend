@@ -17,7 +17,7 @@ const app = express();
 
 dotenv.config();
 // set up and connect to DB
-const dbUri = 'mongodb://0.0.0.0:27017/myLifeStoryDB';
+const dbUri = 'mongodb://four45:fouvc88@0.0.0.0:27017/myLifeStoryDB';
 const dbConfig = {
   useNewUrlParser: true,
 };

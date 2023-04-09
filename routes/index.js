@@ -16,6 +16,13 @@ const NotFoundError = require('../errors/notFoundError');
 
 // routes for register, login-user, login-admin
 // register
+
+// auth middleware have to apply here
+router.post('/login-user', loginUser);
+router.post('/login-admin', loginAdmin);
+
+router.use(auth);
+
 router.post(
   '/register',
   celebrate({
@@ -40,14 +47,6 @@ router.post(
   }),
   registerUser,
 );
-
-// auth middleware have to apply here
-router.post('/login-user', loginUser);
-router.post('/login-admin', loginAdmin);
-
-router.use(auth);
-
-router.post('/register', registerUser);
 
 router.get('/showusers', getAllUser);
 // user route

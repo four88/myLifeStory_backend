@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
@@ -28,6 +29,21 @@ module.exports.getAllUser = (req, res, next) => {
       new NotFoundError('Cannot found any user');
     })
     .then((users) => res.status(SUCCESS_CODE).send({ data: users }))
+    .catch(next);
+};
+
+// delete user
+// eslint-disable-next-line
+module.exports.deleteUser = (req, res, next) => {
+  const id = req.params.userId;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new NotFoundError('Not found this user id');
+  }
+  User.findByIdAndRemove(id)
+    .then((user) => {
+      res.status(SUCCESS_CODE).send({ data: user });
+    })
     .catch(next);
 };
 

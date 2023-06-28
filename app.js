@@ -9,21 +9,25 @@ const { router } = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { NotFoundError } = require('./utils/constant');
 
+dotenv.config();
 const { PORT = 3000 } = process.env;
 
 const { NODE_ENV, DB_URI } = process.env;
 
 const app = express();
 
-dotenv.config();
+const allowedCors = [
+  'http://localhost:5173',
+  'https://admin.mylifestorybook.tech',
+  'https://mylifestorybook.tech',
+];
 // set up and connect to DB
-const dbUri = 'mongodb://127.0.0.1:27017/myLifeStoryDB';
 const dbConfig = {
   useNewUrlParser: true,
 };
 mongoose.Promise = global.Promise;
 // connect DB
-mongoose.connect(NODE_ENV === 'production' ? DB_URI : dbUri, dbConfig).then(
+mongoose.connect(NODE_ENV === 'production' ? DB_URI : DB_URI, dbConfig).then(
   () => {
     console.log('DB connected');
   },
@@ -48,16 +52,17 @@ app.use(
 );
 
 // middleware for allow a cors
-// app.use((req, res, next) => {
-//   const { origin } = req.headers; // assign the corresponding header to the origin variable
-//
-//   if (allowedCors.includes(origin)) { // check that the origin value is among the allowed domains
-//     res.header('Access-Control-Allow-Origin', origin);
-//   }
-//   next();
-// });
-//
-app.options('*', cors());
+app.use((req, res, next) => {
+  const { origin } = req.headers; // assign the corresponding header to the origin variable
+
+  if (allowedCors.includes(origin)) {
+    // check that the origin value is among the allowed domains
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  next();
+});
+
+app.use(cors());
 
 // routes
 app.use(router);

@@ -52,17 +52,17 @@ app.use(
 );
 
 // middleware for allow a cors
-app.use((req, res, next) => {
-  const { origin } = req.headers; // assign the corresponding header to the origin variable
+const corsOptions = {
+  origin(origin, callback) {
+    if (allowedCors.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
 
-  if (allowedCors.includes(origin)) {
-    // check that the origin value is among the allowed domains
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-  next();
-});
-
-app.use(cors());
+app.use(cors(corsOptions));
 
 // routes
 app.use(router);
